@@ -1,134 +1,103 @@
-# Enterprise Multi-VLAN Office Network
+# 🚀 Enterprise Multi-VLAN Office Network — Infrastructure Design & Verification
 
-## Technologies
+![Cisco Packet Tracer](https://img.shields.io/badge/Cisco%20Packet%20Tracer-v8.x-blue?style=for-the-badge&logo=cisco)
+![Network Architecture](https://img.shields.io/badge/Architecture-Multi--VLAN%20Office%20Network-orange?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Verified%20%26%20Tested-success?style=for-the-badge)
 
-- Cisco Packet Tracer
-- VLAN
-- Subnetting
-- OSPF Routing
-- DHCP
-- DNS
-- HTTP (Web Server)
-- Port Security
-- SSH
-- Inter-VLAN Routing
+## 📌 Project Overview
+
+This project presents a compact, secure **Enterprise Office Network** designed and implemented using **Cisco Packet Tracer**. It simulates a small multi-department corporate environment featuring VLAN segmentation, Router-on-a-Stick Inter-VLAN routing, multi-router OSPF connectivity, centralized network services (DHCP, DNS, Web), hardened switch-port security, and SSH-based remote management.
 
 ---
 
-## Topology
+## 🏗️ Topology & Architectural Highlights
 
-- 3 Cisco 2911 Routers
-- 4 Cisco 2960 Switches
-- 1 DHCP/DNS Server
-- 1 Web Server
-- 5 End Devices (PCs & Printer)
-
----
-
-## Network Segments
-
-| Department | VLAN | Network |
-|------------|------|----------------|
-| Finance | VLAN 10 | 192.168.10.0/24 |
-| Sales | VLAN 20 | 192.168.20.0/24 |
-| HR | VLAN 30 | 192.168.30.0/24 |
-| Server Room | VLAN 40 | 192.168.40.0/24 |
+- **Multi-Router Backbone:** 3 Cisco 2911 Routers interconnected via dedicated point-to-point `/30` links, forming the routed backbone of the network.
+- **Access Layer:** 4 Cisco 2960 Switches enforcing VLAN segmentation across Finance, Sales, HR, and the Server Room.
+- **Inter-VLAN Routing:** Router-on-a-Stick design using sub-interfaces for Layer 3 routing between departmental VLANs.
+- **Dynamic Routing:** OSPF deployed across all three routers for automated route discovery and full network reachability.
+- **Centralized Enterprise Services:** Server Room hosting a combined DHCP/DNS Server and an HTTP Web Server.
+- **Security Hardening:** Port Security (Shutdown & Restrict violation modes) on access ports, plus SSH for encrypted remote device management.
 
 ---
 
-## Routing
+## 🛠️ Key Technologies & Protocols
 
-- OSPF Dynamic Routing
-- Multi-Router Connectivity
-- Inter-VLAN Routing
-- End-to-End Network Communication
-
----
-
-## Services
-
-- DHCP Server
-- DNS Server
-- Web Server (HTTP)
-- Automatic IP Address Assignment
-- Automatic Default Gateway Assignment
-- DNS Name Resolution
+| Protocol / Technology | Implementation Details |
+| :--- | :--- |
+| **VLAN Segmentation** | 4 departmental VLANs (Finance, Sales, HR, Server Room) isolated via 802.1Q trunking. |
+| **Inter-VLAN Routing** | Router-on-a-Stick configuration using sub-interfaces on Cisco 2911 routers. |
+| **OSPF Dynamic Routing** | Multi-router OSPF adjacency established across 3 Cisco 2911 routers. |
+| **DHCP Relay Agent** | Centralized DHCP allocation using `ip helper-address` on router sub-interfaces. |
+| **DNS & Web Hosting** | Internal DNS name resolution pointing to the local HTTP Web Server. |
+| **Port Security** | Sticky MAC learning with Shutdown & Restrict violation modes on access switches. |
+| **SSH Remote Management** | Secure CLI access to network devices for encrypted remote administration. |
 
 ---
 
-## Security
+## 📊 VLAN Addressing & Inter-Router Links
 
-- SSH Remote Management
-- Switch Port Security
-- Shutdown Violation Mode
-- Restrict Violation Mode
-- Secure MAC Address Learning
-
----
-
-## Features
-
-- VLAN Segmentation
-- Dynamic Routing with OSPF
-- DHCP Relay (IP Helper Address)
-- DNS Resolution
-- Web Server Access
-- Secure Remote Management
-- Port Security Configuration
-- Enterprise Network Design
-
----
-
-## IP Addressing
+| VLAN ID | Department / Zone | IP Subnet | Default Gateway |
+| :---: | :--- | :--- | :--- |
+| **10** | FINANCE | `192.168.10.0/24` | `192.168.10.1` |
+| **20** | SALES | `192.168.20.0/24` | `192.168.20.1` |
+| **30** | HR | `192.168.30.0/24` | `192.168.30.1` |
+| **40** | SERVER ROOM | `192.168.40.0/24` | `192.168.40.1` |
 
 | Link | Network |
-|------|----------|
-| Router1 ↔ Router2 | 10.0.0.0/30 |
-| Router2 ↔ Router3 | 10.0.0.4/30 |
+| :--- | :--- |
+| Router1 ↔ Router2 | `10.0.0.0/30` |
+| Router2 ↔ Router3 | `10.0.0.4/30` |
 
 ---
 
-## Project Objectives
+## ⚙️ Essential CLI Configuration Snippets
 
-- Design a small enterprise office network.
-- Separate departments using VLANs.
-- Configure OSPF for dynamic routing.
-- Deploy DHCP, DNS, and Web services.
-- Secure switch ports using Port Security.
-- Enable secure device management via SSH.
-- Verify end-to-end connectivity between all VLANs.
+<details>
+<summary><b>1. Router-on-a-Stick Inter-VLAN Routing & DHCP Relay</b></summary>
+
+```text
+Router(config)# interface GigabitEthernet0/0.10
+Router(config-subif)# encapsulation dot1Q 10
+Router(config-subif)# ip address 192.168.10.1 255.255.255.0
+
+Router(config)# interface GigabitEthernet0/0.20
+Router(config-subif)# encapsulation dot1Q 20
+Router(config-subif)# ip address 192.168.20.1 255.255.255.0
+
+Router(config)# interface GigabitEthernet0/0.40
+Router(config-subif)# encapsulation dot1Q 40
+Router(config-subif)# ip address 192.168.40.1 255.255.255.0
+Router(config-subif)# ip helper-address 192.168.40.2
+```
+</details>
+
+<details>
+<summary><b>2. Switch Port Security Configuration</b></summary>
+
+```text
+Switch(config)# interface FastEthernet0/1
+Switch(config-if)# switchport mode access
+Switch(config-if)# switchport port-security
+Switch(config-if)# switchport port-security maximum 1
+Switch(config-if)# switchport port-security mac-address sticky
+Switch(config-if)# switchport port-security violation restrict
+```
+</details>
 
 ---
 
-## Verification
+## ✅ Verification & Testing Results
 
-✔ DHCP Lease Successful
-
-✔ DNS Resolution Working
-
-✔ Web Server Accessible
-
-✔ OSPF Neighbor Adjacency Established
-
-✔ Inter-VLAN Communication Successful
-
-✔ SSH Remote Access Functional
-
-✔ Port Security Tested
+- **Dynamic IP Allocation:** Verified across all VLANs via DHCP Relay Agent (`ip helper-address`).
+- **End-to-End Connectivity:** ICMP ping verified between all VLAN subnets and across all inter-router links.
+- **DNS & Web Services:** End-user browser testing confirms successful HTTP web page access via the internal DNS record.
+- **OSPF Neighbor Adjacency:** Confirmed full adjacency across all three routers via `show ip ospf neighbor`.
+- **Remote Management & Port Security:** SSH access confirmed; Shutdown and Restrict violation modes tested and verified on access ports.
 
 ---
 
-## Skills Demonstrated
-
-- Enterprise Network Design
-- IPv4 Addressing & Subnetting
-- VLAN Configuration
-- Inter-VLAN Routing
-- OSPF
-- DHCP
-- DNS
-- HTTP
-- SSH
-- Port Security
-- Cisco IOS Configuration
-- Network Troubleshooting
+## 👤 Author
+**Yadigarzade Ceyhun**
+- **Project:** Enterprise Network Services Lab
+- **Environment:** Cisco Packet Tracer v8.x
